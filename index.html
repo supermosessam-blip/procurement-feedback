@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Procurement Feedback</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0e17;
+      --surface: #111827;
+      --surface-2: #1a2332;
+      --border: #243044;
+      --text: #e8eef7;
+      --text-muted: #8b9cb3;
+      --accent: #38bdf8;
+      --accent-2: #22d3ee;
+      --gold: #f0b429;
+      --success: #34d399;
+      --danger: #f87171;
+      --radius: 14px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* subtle gradient overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse 80% 50% at 20% -10%, rgba(56, 189, 248, 0.08), transparent),
+        radial-gradient(ellipse 60% 40% at 90% 10%, rgba(34, 211, 238, 0.05), transparent);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 48px 20px 80px;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      color: var(--accent);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1rem;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    /* Form card */
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px 32px;
+      box-shadow: 0 20px 40px -12px rgba(0,0,0,0.5);
+    }
+
+    @media (max-width: 520px) {
+      .form-card { padding: 28px 20px; }
+      h1 { font-size: 1.75rem; }
+    }
+
+    .section {
+      margin-bottom: 32px;
+    }
+
+    .section:last-of-type { margin-bottom: 0; }
+
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .section-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .req { color: var(--danger); }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 16px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: var(--text);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #5a6a80;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+      line-height: 1.55;
+    }
+
+    /* Rating */
+    .rating-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+
+    .rating-grid input { display: none; }
+
+    .rating-grid label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 8px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .rating-grid label .num {
+      font-size: 1.35rem;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .rating-grid label .txt {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    .rating-grid input:checked + label {
+      background: rgba(56, 189, 248, 0.12);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+
+    .rating-grid input:checked + label .num,
+    .rating-grid input:checked + label .txt {
+      color: var(--accent);
+    }
+
+    .rating-grid label:hover {
+      border-color: #3b82f6;
+      background: rgba(56, 189, 248, 0.06);
+    }
+
+    
+    /* Submit */
+    .submit-row {
+      margin-top: 36px;
+      display: flex;
+      gap: 12px;
+    }
+
+    button {
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      padding: 15px 28px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-submit {
+      flex: 1;
+      background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+      color: #0a0e17;
+      box-shadow: 0 4px 20px rgba(14, 165, 233, 0.3);
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 28px rgba(14, 165, 233, 0.4);
+    }
+
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Success state */
+    #success {
+      display: none;
+      text-align: center;
+      padding: 60px 30px;
+    }
+
+    #success .icon {
+      width: 72px;
+      height: 72px;
+      background: rgba(52, 211, 153, 0.12);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      color: var(--success);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin: 0 auto 24px;
+    }
+
+    #success h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    #success p {
+      color: var(--text-muted);
+      max-width: 340px;
+      margin: 0 auto 28px;
+    }
+
+    #success button {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 12px 24px;
+    }
+
+    #success button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .error-msg {
+      color: var(--danger);
+      font-size: 0.8rem;
+      margin-top: 6px;
+      display: none;
+    }
+
+    .field.error .error-msg { display: block; }
+    .field.error input,
+    .field.error textarea {
+      border-color: var(--danger);
+    }
+
+    .field.error .rating-grid label {
+      border-color: rgba(248, 113, 113, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="badge">Procurement Feedback</div>
+      <h1>Doctor Feedback Form</h1>
+      <p class="subtitle">Help us improve how we support clinical teams with supplies and equipment.</p>
+    </header>
+
+    <div class="form-card" id="formWrapper">
+      <form id="feedbackForm" action="https://formsubmit.co/soft.saleem@gmail.com" method="POST">
+        <!-- FormSubmit settings -->
+        <input type="hidden" name="_subject" value="New Procurement Feedback from Doctor">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_next" value="">
+
+        <!-- Name only -->
+        <div class="section">
+          <div class="section-label">Identity</div>
+          <div class="field" id="nameField">
+            <label for="name">Doctor's Name <span class="req">*</span></label>
+            <input type="text" id="name" name="Doctor Name" placeholder="Dr. Full Name" required>
+            <div class="error-msg">Please enter your name.</div>
+          </div>
+        </div>
+
+        <!-- Rating -->
+        <div class="section">
+          <div class="section-label">Overall Rating</div>
+          <div class="section-title">How would you rate Procurement overall?</div>
+          <div class="field" id="ratingField">
+            <div class="rating-grid">
+              <div>
+                <input type="radio" id="r1" name="Rating" value="1 - Poor" required>
+                <label for="r1"><span class="num">1</span><span class="txt">Poor</span></label>
+              </div>
+              <div>
+                <input type="radio" id="r2" name="Rating" value="2 - Fair">
+                <label for="r2"><span class="num">2</span><span class="txt">Fair</span></label>
+              </div>
+              <div>
+                <input type="radio" id="r3" name="Rating" value="3 - Average">
+                <label for="r3"><span class="num">3</span><span class="txt">Average</span></label>
+              </div>
+              <div>
+                <input type="radio" id="r4" name="Rating" value="4 - Good">
+                <label for="r4"><span class="num">4</span><span class="txt">Good</span></label>
+              </div>
+              <div>
+                <input type="radio" id="r5" name="Rating" value="5 - Excellent">
+                <label for="r5"><span class="num">5</span><span class="txt">Excellent</span></label>
+              </div>
+            </div>
+            <div class="error-msg">Please select a rating.</div>
+          </div>
+        </div>
+
+        <!-- Why -->
+        <div class="section">
+          <div class="section-label">Reason</div>
+          <div class="field" id="whyField">
+            <label for="why">Why did you give this rating? <span class="req">*</span></label>
+            <textarea id="why" name="Why this rating" placeholder="What specifically influenced your score?" required></textarea>
+            <div class="error-msg">This field is required.</div>
+          </div>
+        </div>
+
+        <!-- Likes -->
+        <div class="section">
+          <div class="section-label">Strengths</div>
+          <div class="field">
+            <label for="likes">What do you specifically like about Procurement?</label>
+            <textarea id="likes" name="What you like" placeholder="Responsiveness, quality, speed, communication..."></textarea>
+          </div>
+        </div>
+
+        <!-- Improve -->
+        <div class="section">
+          <div class="section-label">Improvement</div>
+          <div class="field">
+            <label for="improve">What's your opinion on how Procurement can improve?</label>
+            <textarea id="improve" name="How to improve" placeholder="Processes, lead times, quality, communication..."></textarea>
+          </div>
+        </div>
+
+        <!-- Urgent Need -->
+        <div class="section">
+          <div class="section-label">Urgent</div>
+          <div class="field" id="urgentField">
+            <label for="urgent">What is your most urgent need from Procurement? <span class="req">*</span></label>
+            <textarea id="urgent" name="Urgent need" placeholder="The most pressing requirement right now..." required></textarea>
+            <div class="error-msg">This field is required.</div>
+          </div>
+        </div>
+
+        <!-- Next 12 months -->
+        <div class="section">
+          <div class="section-label">Looking Ahead</div>
+          <div class="field">
+            <label for="next12">Your suggestion for the next 12 months</label>
+            <textarea id="next12" name="Suggestions for next 12 months" placeholder="Priorities, tools, processes, focus areas..."></textarea>
+          </div>
+        </div>
+
+        <div class="submit-row">
+          <button type="submit" class="btn-submit" id="submitBtn">Submit Feedback</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Success -->
+    <div class="form-card" id="success">
+      <div class="icon">✓</div>
+      <h2>Thank you</h2>
+      <p>Your feedback has been sent successfully. We appreciate your time.</p>
+      <button type="button" id="againBtn">Submit another response</button>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('feedbackForm');
+    const formWrapper = document.getElementById('formWrapper');
+    const success = document.getElementById('success');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Set the redirect to stay on same page and show success
+    // FormSubmit will still send the email
+    form.querySelector('input[name="_next"]').value = window.location.href.split('?')[0] + '?sent=1';
+
+    // Check if just submitted
+    if (window.location.search.includes('sent=1')) {
+      formWrapper.style.display = 'none';
+      success.style.display = 'block';
+      // Clean URL
+      history.replaceState(null, '', window.location.pathname);
+    }
+
+    form.addEventListener('submit', function(e) {
+      // Basic client validation
+      let valid = true;
+      document.querySelectorAll('.field').forEach(f => f.classList.remove('error'));
+
+      if (!form.name.value.trim()) {
+        document.getElementById('nameField').classList.add('error');
+        valid = false;
+      }
+      if (!form.querySelector('input[name="Rating"]:checked')) {
+        document.getElementById('ratingField').classList.add('error');
+        valid = false;
+      }
+      if (!form.why.value.trim()) {
+        document.getElementById('whyField').classList.add('error');
+        valid = false;
+      }
+      if (!form.urgent.value.trim()) {
+        document.getElementById('urgentField').classList.add('error');
+        valid = false;
+      }
+
+      if (!valid) {
+        e.preventDefault();
+        const first = document.querySelector('.field.error');
+        if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      // Show loading state
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending...';
+    });
+
+    document.getElementById('againBtn').addEventListener('click', () => {
+      form.reset();
+      document.querySelectorAll('.field').forEach(f => f.classList.remove('error'));
+      success.style.display = 'none';
+      formWrapper.style.display = 'block';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Feedback';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>
